@@ -1,18 +1,66 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 //components
 import Header from "./components/Header";
 import List from "./components/List";
 import Editor from "./components/Editor";
 import Todoitem from "./components/Todoitem";
+
+const mockData = [
+  {
+    id: 0,
+    isDone: false,
+    content: "React 공부하기",
+    date: new Date().getTime(),
+  },
+  {
+    id: 1,
+    isDone: false,
+    content: "빨래하기",
+    date: new Date().getTime(),
+  },
+  {
+    id: 2,
+    isDone: false,
+    content: "노래 연습하기",
+    date: new Date().getTime(),
+  },
+];
 function App() {
+  const [todos, setTodos] = useState(mockData);
+  const idRef = useRef(3);
+
+  const onCreate = (content) => {
+    const newTodo = {
+      id: idRef.current++,
+      isDone: false,
+      content: content,
+      date: new Date().getTime(),
+    };
+
+    setTodos([newTodo, ...todos]);
+    console.log(todos);
+  };
+
+  const onUpdate = (targetId) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === targetId ? { ...todo, isDone: !todo.isDone } : todo
+      )
+    );
+  };
+
+  const onDelete = (targetId) => {
+    setTodos(todos.filter((todo) => todo.id !== targetId));
+  };
+
   return (
-    <div className="App w-[500px] my-0 mx-auto flex flex-col gap-[10px]">
+    <div className="App w-[500px] my-0 mx-auto flex flex-col gap-[20px] h-[100vh] justify-center">
       <header>
         <Header></Header>
       </header>
-      <Editor></Editor>
-      <List></List>
+      <Editor onCreate={onCreate}></Editor>
+      <List todos={todos} onUpdate={onUpdate} onDelete={onDelete}></List>
     </div>
   );
 }
